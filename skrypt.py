@@ -6,14 +6,13 @@ Created on Tue Apr 11 10:23:53 2023
 """
 
 import numpy as np
+import sys
 
 class Transformation:
     
-    def __init__(self,a,e2,name,plik_wynikowy):
+    def __init__(self,a,e2):
         self.a = a
         self.e2 = e2
-        self.name = name
-        self.plik_wynikowy = plik_wynikowy
     def Npu(self,fi):
         import numpy as np    
         N = self.a / np.sqrt(1 - self.e2 * np.sin(fi)**2)
@@ -22,10 +21,7 @@ class Transformation:
     def hirvonen(self,X,Y,Z):
         import numpy as np    
         p = np.sqrt(X**2+Y**2)
-        try:
-            fi = np.arctan(Z/(p*(1-self.e2)))
-        except Exception:
-            print("nie dziel przez 0")
+        fi = np.arctan(Z/(p*(1-self.e2)))
             
         while True:
             N = self.Npu(fi)
@@ -133,12 +129,26 @@ class Transformation:
     def odczyt(self,plik_wsadowy):
         import numpy as np
         dane = np.genfromtxt(plik_wsadowy,delimiter = "&")
-        dane2 = dane*2
-        self.plik_wynikowy = np.savetxt(self.plik_wynikowy, dane2, delimiter=';')
+        dane2 = dane*3
+        plik_wynikowy = np.savetxt('plik_wynikowy.txt', dane2, delimiter=';')
         print("udało się")
 
         return dane
     
 if __name__ == '__main__':
-    el = Transformation(664959, 0.9, "elipsoida probna","wyniki_proba.txt")
-    dane =el.odczyt("plik_wsadowy_proba1.txt") 
+    nazwa = input(str('Wpisz nazwe: '))
+    
+    if nazwa == 'WGS84':
+        a = 6378137.000
+        e2 = 0.00669438002290
+    elif nazwa == 'GRS80':
+        a = 6378137.000
+        e2 = 0.00669438002290
+    elif nazwa == 'Krasowski':
+        a = 6378245.000
+        e2 = 0.00669342162296
+    else:
+        sys.exit('Podano zla nazwe elipsoidy')
+    
+    el = Transformation(a, e2)
+    dane = el.odczyt("plik_wsadowy_proba1.txt") 
