@@ -40,11 +40,14 @@ class Transformation:
         return wyniki
 
     def hirvonen_odw(self,fi,lam,h):
-        N = self.Npu(fi)
-        Xk = (N+h)*np.cos(fi)*np.cos(lam)
-        Yk = (N+h)*np.cos(fi)*np.sin(lam)
-        Zk = (N*(1-self.e2)+h)*np.sin(fi)        
-        return Xk, Yk, Zk
+        wyniki = []
+        for fi, lam, h in zip(fi, lam, h):
+            N = self.Npu(fi)
+            Xk = (N+h)*np.cos(fi)*np.cos(lam)
+            Yk = (N+h)*np.cos(fi)*np.sin(lam)
+            Zk = (N*(1-self.e2)+h)*np.sin(fi)   
+            wyniki.append([Xk,Yk,Zk])
+        return wyniki
     
     
     def pl1992(self,fi,lama,m=0.9993):  
@@ -76,56 +79,70 @@ class Transformation:
         return  x92, y92
 
     def pl2000(self,fi,lama,m=0.999923):
-        lama0 = 0
-        strefa = 0
-        if lama >np.deg2rad(13.5) and lama < np.deg2rad(16.5):
-            strefa = 5
-            lama0 = np.deg2rad(15)
-        elif lama >np.deg2rad(16.5) and lama < np.deg2rad(19.5):
-            strefa = 6
-            lama0 = np.deg2rad(18)
-        elif lama >np.deg2rad(19.5) and lama < np.deg2rad(22.5):
-            strefa =7
-            lama0 = np.deg2rad(21)
-        elif lama >np.deg2rad(22.5) and lama < np.deg2rad(25.5):
-            strefa = 8
-            lama0 = np.deg2rad(24)
-        # else:
-        #     print("Punkt poza strefami odwzorowawczymi układu PL-2000")        
-        
-        # 1 parametry elipsoidy     
-        b2 = self.a**2*(1-self.e2)    
-        ep2 = (self.a**2-b2)/b2
-        # 2. Wielkosci pomocnicze     
-        dellama = lama - lama0
-        t = np.tan(fi)
-        ni2 = ep2*(np.cos(fi)**2)
-        N = self.Npu(fi)
-        
-        # 3. Długosc luku poludnika 
-        A0 = 1- (self.e2/4)-(3*self.e2**2/64)-(5*self.e2**3/256)
-        A2 = (3/8)*(self.e2+(self.e2**2/4)+(15*self.e2**3/128))
-        A4 = (15/256)*(self.e2**2+((3*self.e2**3)/4))
-        A6 = (35*self.e2**3)/3072
-        
-        sigma = self.a *(A0*fi-A2*np.sin(2*fi)+A4*np.sin(4*fi)-A6*np.sin(6*fi))
-        
-        # wsolrzedne prostokatne lokalne na plaszczyznie gaussa-krugera
-        
-        xgk =  sigma    +    ( ((dellama**2/2)*N*np.sin(fi)*np.cos(fi))    *    (1   +   ((dellama**2/12)*(np.cos(fi)**2)*(5 - t**2 + 9*ni2 + 4*ni2**2))      +         ((dellama**4/360)*(np.cos(fi)**4)*(61 - 58*t**2 + t**4 + 270*ni2 - 330*ni2*t**2))))
-        
-        ygk =  (dellama* N * np.cos(fi))  *   ( 1 +  ((dellama**2/6)   *   (np.cos(fi)**2)   *  (1 - t**2 + ni2))     +     (((dellama**4/120)*(np.cos(fi)**4)) * (5 - (18*t**2) + t**4 + (14 * ni2) - (58*ni2*t**2))))
-        
-        x2000 = xgk * m 
-        y2000 = ygk*m + (strefa *1000000) +500000
-        return  x2000, y2000
+        wyniki = []
+        for fi, lam in zip (fi,lama) :
+            lama0 = 0
+            strefa = 0
+            if lama >np.deg2rad(13.5) and lama < np.deg2rad(16.5):
+                strefa = 5
+                lama0 = np.deg2rad(15)
+            elif lama >np.deg2rad(16.5) and lama < np.deg2rad(19.5):
+                strefa = 6
+                lama0 = np.deg2rad(18)
+            elif lama >np.deg2rad(19.5) and lama < np.deg2rad(22.5):
+                strefa =7
+                lama0 = np.deg2rad(21)
+            elif lama >np.deg2rad(22.5) and lama < np.deg2rad(25.5):
+                strefa = 8
+                lama0 = np.deg2rad(24)
+            # else:
+            #     print("Punkt poza strefami odwzorowawczymi układu PL-2000")        
+            
+            # 1 parametry elipsoidy     
+            b2 = self.a**2*(1-self.e2)    
+            ep2 = (self.a**2-b2)/b2
+            # 2. Wielkosci pomocnicze     
+            dellama = lama - lama0
+            t = np.tan(fi)
+            ni2 = ep2*(np.cos(fi)**2)
+            N = self.Npu(fi)
+            
+            # 3. Długosc luku poludnika 
+            A0 = 1- (self.e2/4)-(3*self.e2**2/64)-(5*self.e2**3/256)
+            A2 = (3/8)*(self.e2+(self.e2**2/4)+(15*self.e2**3/128))
+            A4 = (15/256)*(self.e2**2+((3*self.e2**3)/4))
+            A6 = (35*self.e2**3)/3072
+            
+            sigma = self.a *(A0*fi-A2*np.sin(2*fi)+A4*np.sin(4*fi)-A6*np.sin(6*fi))
+            
+            # wsolrzedne prostokatne lokalne na plaszczyznie gaussa-krugera
+            
+            xgk =  sigma    +    ( ((dellama**2/2)*N*np.sin(fi)*np.cos(fi))    *    (1   +   ((dellama**2/12)*(np.cos(fi)**2)*(5 - t**2 + 9*ni2 + 4*ni2**2))      +         ((dellama**4/360)*(np.cos(fi)**4)*(61 - 58*t**2 + t**4 + 270*ni2 - 330*ni2*t**2))))
+            ygk =  (dellama* N * np.cos(fi))  *   ( 1 +  ((dellama**2/6)   *   (np.cos(fi)**2)   *  (1 - t**2 + ni2))     +     (((dellama**4/120)*(np.cos(fi)**4)) * (5 - (18*t**2) + t**4 + (14 * ni2) - (58*ni2*t**2))))
+            
+            x2000 = xgk * m 
+            y2000 = ygk*m + (strefa *1000000) +500000
+            wyniki.append(x2000,y2000)
+        return  wyniki
     
     def odczyt(self,plik_wsadowy, transformacja):
         dane = np.genfromtxt(plik_wsadowy,delimiter = " ")
         if transformacja == 'hirvonen':
             wyniki = self.hirvonen(dane[:,0], dane[:,1], dane[:,2])
             plik_wynikowy = np.savetxt('plik_wynikowy.txt', wyniki, delimiter=' ', fmt='%0.10f %0.10f %0.3f')
-
+        
+        
+        elif transformacja == 'hirvonen_odw':
+            wyniki = self.hirvonen_odw(np.deg2rad((dane[:,0])), np.deg2rad(dane[:,1]), dane[:,2])
+            plik_wynikowy = np.savetxt('plik_wynikowy.txt', wyniki, delimiter=' ', fmt='%0.3f %0.3f %0.3f')
+        
+        #Cos mi tu nie idzie
+        # elif transformacja == 'PL2000':
+        #     ## Tu trzeba się dogadać ale to też bedzie wazne do 92 i hirvonena_odw czy zakładamy ze pliki wrzucamy w X Y Z zawsze ,czy osobna struktura z fi lam h
+        #     daneh = self.hirvonen(dane[:,0], dane[:,1], dane[:,2])  
+        #     wyniki = self.pl2000(np.deg2rad(float((daneh[:,0]))), np.deg2rad(float(daneh[:,1])), float(daneh[:,2]))
+        #     plik_wynikowy = np.savetxt('plik_wynikow.txt', wyniki, delimiter=' ', fmt='%0.3f %0.3f %0.3f')
+            
         return
     
 if __name__ == '__main__':
@@ -140,9 +157,9 @@ if __name__ == '__main__':
         
         # te ify sa po to zeby dzialalo jesli nie odpalasz przez cmd albo nie uzywasz flag
         # jesli nie chcesz co chwila wpisywac danych to to odkomentuj i zmieniaj na co chcesz
-        #args.el = 'GRS80'
-        #args.p = 'plik_dane.txt'
-        #args.t = 'hirvonen'
+        # args.el = 'GRS80'
+        # args.p = 'plik_dane.txt'
+        # args.t = 'hirvonen'
         
         if args.el==None:
             args.el = input(str('Podaj nazwe elipsoidy: '))
@@ -152,7 +169,7 @@ if __name__ == '__main__':
         print('Zle podano nazwe elipsoidy')
     else:
         try:
-            transformacje = {'hirvonen': 'hirvonen'}
+            transformacje = {'hirvonen': 'hirvonen','hirvonen_odw': 'hirvonen_odw','PL2000':'PL2000'}
             if args.p==None:
                 args.p = input(str('Wklej sciezke do pliku txt z danymi: '))
     
@@ -160,6 +177,7 @@ if __name__ == '__main__':
                 args.t = input(str('Jaka transformacje wykonac?: '))
             
             dane = obiekt.odczyt(args.p, transformacje[args.t])
+            
         except FileNotFoundError:
             print('Podany plik nie istnieje')
         except KeyError:
