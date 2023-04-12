@@ -6,38 +6,40 @@ Created on Tue Apr 11 10:23:53 2023
 """
 
 import numpy as np
-import sys
+from argparse import ArgumentParser
 
 class Transformation:
     
-    def __init__(self,a,e2):
-        self.a = a
-        self.e2 = e2
+    def __init__(self,elip):
+        self.a = elip[0]
+        self.e2 = elip[1]
+        
     def Npu(self,fi):
-        import numpy as np    
         N = self.a / np.sqrt(1 - self.e2 * np.sin(fi)**2)
         return N
     
     def hirvonen(self,X,Y,Z):
-        import numpy as np    
-        p = np.sqrt(X**2+Y**2)
-        fi = np.arctan(Z/(p*(1-self.e2)))
-            
-        while True:
+        wyniki = []
+        for X, Y, Z in zip(X, Y, Z):
+            p = np.sqrt(X**2+Y**2)
+            fi = np.arctan(Z/(p*(1-self.e2)))
+                
+            while True:
+                N = self.Npu(fi)
+                h = (p/np.cos(fi)) - N
+                fi_poprzednia = fi
+                fi = np.arctan((Z/p)/(1-((N*self.e2)/(N+h))))
+                if abs(fi_poprzednia-fi)<(0.000001/206265):
+                    break
+                
             N = self.Npu(fi)
-            h = (p/np.cos(fi)) - N
-            fi_poprzednia = fi
-            fi = np.arctan((Z/p)/(1-((N*self.e2)/(N+h))))
-            if abs(fi_poprzednia-fi)<(0.000001/206265):
-                break
-        N = self.Npu(fi)
-        h = p/np.cos(fi) - N
-        lam = np.arctan(Y/X)
-        
-        return fi, lam, h
+            h = p/np.cos(fi) - N
+            lam = np.arctan(Y/X)
+            wyniki.append([np.rad2deg(fi), np.rad2deg(lam), h])
+            
+        return wyniki
 
     def hirvonen_odw(self,fi,lam,h):
-        import numpy as np    
         N = self.Npu(fi)
         Xk = (N+h)*np.cos(fi)*np.cos(lam)
         Yk = (N+h)*np.cos(fi)*np.sin(lam)
@@ -45,8 +47,7 @@ class Transformation:
         return Xk, Yk, Zk
     
     
-    def pl1992(self,fi,lama,m=0.9993):
-        import numpy as np    
+    def pl1992(self,fi,lama,m=0.9993):  
         lama0 = np.deg2rad(19)
     # # 1 parametry elipsoidy     
         b2 = self.a**2*(1-self.e2)
@@ -75,8 +76,6 @@ class Transformation:
         return  x92, y92
 
     def pl2000(self,fi,lama,m=0.999923):
-        import numpy as np    
-
         lama0 = 0
         strefa = 0
         if lama >np.deg2rad(13.5) and lama < np.deg2rad(16.5):
@@ -120,35 +119,52 @@ class Transformation:
         x2000 = xgk * m 
         y2000 = ygk*m + (strefa *1000000) +500000
         return  x2000, y2000
-        
-    def hej(self):
-        print("Czesc, jestem",self.name)
     
-    
-    ### COS NIE DZIALA NIE ZAPISUJE W PLIKU :(
-    def odczyt(self,plik_wsadowy):
-        import numpy as np
-        dane = np.genfromtxt(plik_wsadowy,delimiter = "&")
-        dane2 = dane*3
-        plik_wynikowy = np.savetxt('plik_wynikowy.txt', dane2, delimiter=';')
-        print("udało się")
+    def odczyt(self,plik_wsadowy, transformacja):
+        dane = np.genfromtxt(plik_wsadowy,delimiter = " ")
+        if transformacja == 'hirvonen':
+            wyniki = self.hirvonen(dane[:,0], dane[:,1], dane[:,2])
+            plik_wynikowy = np.savetxt('plik_wynikowy.txt', wyniki, delimiter=' ', fmt='%0.10f %0.10f %0.3f')
 
-        return dane
+        return
     
 if __name__ == '__main__':
-    nazwa = input(str('Wpisz nazwe: '))
-    
-    if nazwa == 'WGS84':
-        a = 6378137.000
-        e2 = 0.00669438002290
-    elif nazwa == 'GRS80':
-        a = 6378137.000
-        e2 = 0.00669438002290
-    elif nazwa == 'Krasowski':
-        a = 6378245.000
-        e2 = 0.00669342162296
+    try:
+        parser = ArgumentParser()
+        parser.add_argument('-p', type=str) #przyjmuje plik
+        parser.add_argument('-el', type=str) #przyjmuje nazwe elipsoidy
+        parser.add_argument('-t', type=str) #przyjmuje jaka transformacje wykonac
+        args = parser.parse_args()
+        
+        elipsoidy = {'WGS84':[6378137.000, 0.00669438002290], 'GRS80':[6378137.000, 0.00669438002290], 'Krasowski':[6378245.000, 0.00669342162296]}
+        
+        # te ify sa po to zeby dzialalo jesli nie odpalasz przez cmd albo nie uzywasz flag
+        # jesli nie chcesz co chwila wpisywac danych to to odkomentuj i zmieniaj na co chcesz
+        #args.el = 'GRS80'
+        #args.p = 'plik_dane.txt'
+        #args.t = 'hirvonen'
+        
+        if args.el==None:
+            args.el = input(str('Podaj nazwe elipsoidy: '))
+        
+        obiekt = Transformation(elipsoidy[args.el])
+    except KeyError:
+        print('Zle podano nazwe elipsoidy')
     else:
-        sys.exit('Podano zla nazwe elipsoidy')
+        try:
+            transformacje = {'hirvonen': 'hirvonen'}
+            if args.p==None:
+                args.p = input(str('Wklej sciezke do pliku txt z danymi: '))
     
-    el = Transformation(a, e2)
-    dane = el.odczyt("plik_wsadowy_proba1.txt") 
+            if args.t==None:
+                args.t = input(str('Jaka transformacje wykonac?: '))
+            
+            dane = obiekt.odczyt(args.p, transformacje[args.t])
+        except FileNotFoundError:
+            print('Podany plik nie istnieje')
+        except KeyError:
+            print('Zle podana transformacja')
+        else:
+            print('Plik wynikowy zostal utworzony')
+        finally:
+            print('Koniec programu')
