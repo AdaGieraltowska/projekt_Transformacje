@@ -2,7 +2,7 @@
 """
 Created on Tue Apr 11 10:23:53 2023
 
-@author: Ada
+@author: Ada&Rafal
 """
 
 import numpy as np
@@ -125,41 +125,69 @@ class Transformation:
             wyniki.append(x2000,y2000)
         return  wyniki
     
+    def Rneu(self, phi, lam):
+        Rneu = np.array([[-np.sin(phi)*np.cos(lam), -np.sin(lam), np.cos(phi)*np.cos(lam)],
+                         [-np.sin(phi)*np.sin(lam), np.cos(lam), np.cos(phi)*np.sin(lam)],
+                         [np.cos(phi), 0, np.sin(phi)]])
+        return Rneu
+    
+    def xyz2neup(self, X, Y, Z, X0, Y0, Z0):
+        wyniki = []
+        # jak korzystalem z definicji hirvonen to blad wyskakiwal
+        p = np.sqrt(X0**2+Y0**2)
+        fi = np.arctan(Z0/(p*(1-self.e2)))
+        while True:
+            N = self.Npu(fi)
+            h = (p/np.cos(fi)) - N
+            fi_poprzednia = fi
+            fi = np.arctan((Z0/p)/(1-((N*self.e2)/(N+h))))
+            if abs(fi_poprzednia-fi)<(0.000001/206265):
+                break 
+        N = self.Npu(fi)
+        h = p/np.cos(fi) - N
+        lam = np.arctan(Y0/X0)
+        
+        R_neu = self.Rneu(fi, lam)
+        for X, Y, Z in zip(X, Y, Z):
+            X_sr = [X-X0, Y-Y0, Z-Z0] 
+            X_rneu = R_neu.T@X_sr
+            wyniki.append(X_rneu.T)
+        return wyniki
+    
     def odczyt(self,plik_wsadowy, transformacja):
         dane = np.genfromtxt(plik_wsadowy,delimiter = " ")
         if transformacja == 'hirvonen':
             wyniki = self.hirvonen(dane[:,0], dane[:,1], dane[:,2])
             plik_wynikowy = np.savetxt('plik_wynikowy.txt', wyniki, delimiter=' ', fmt='%0.10f %0.10f %0.3f')
-        
-        
         elif transformacja == 'hirvonen_odw':
             wyniki = self.hirvonen_odw(np.deg2rad((dane[:,0])), np.deg2rad(dane[:,1]), dane[:,2])
             plik_wynikowy = np.savetxt('plik_wynikowy.txt', wyniki, delimiter=' ', fmt='%0.3f %0.3f %0.3f')
-        
         #Cos mi tu nie idzie
         # elif transformacja == 'PL2000':
         #     ## Tu trzeba się dogadać ale to też bedzie wazne do 92 i hirvonena_odw czy zakładamy ze pliki wrzucamy w X Y Z zawsze ,czy osobna struktura z fi lam h
         #     daneh = self.hirvonen(dane[:,0], dane[:,1], dane[:,2])  
         #     wyniki = self.pl2000(np.deg2rad(float((daneh[:,0]))), np.deg2rad(float(daneh[:,1])), float(daneh[:,2]))
         #     plik_wynikowy = np.savetxt('plik_wynikow.txt', wyniki, delimiter=' ', fmt='%0.3f %0.3f %0.3f')
-            
+        elif transformacja == 'xyz2neup':
+            wyniki = self.xyz2neup(dane[1:,0], dane[1:,1], dane[1:,2], dane[0,0], dane[0,1], dane[0,2])
+            plik_wynikowy = np.savetxt('plik_wynikowy.txt', wyniki, delimiter=' ', fmt='%0.3f %0.3f %0.3f')
         return
     
 if __name__ == '__main__':
     try:
         parser = ArgumentParser()
-        parser.add_argument('-p', type=str) #przyjmuje plik
-        parser.add_argument('-el', type=str) #przyjmuje nazwe elipsoidy
-        parser.add_argument('-t', type=str) #przyjmuje jaka transformacje wykonac
+        parser.add_argument('-p', type=str, help='Przyjmuje sciezke do pliku z danymi wejsciowymi, jesli plik jest w tym samym folderze co skrypt to wystarczy nazwa pliku z rozszerzeniem')
+        parser.add_argument('-el', type=str, help='Przyjmuje nazwe elipsoidy. Dostepne: WGS84, GRS80 lub Krasowski')
+        parser.add_argument('-t', type=str, help='Przyjmuje nazwe wybranej transformacji. Dostepne: hirvonen, hirvonen_odw, xyz2neup')
         args = parser.parse_args()
-        
+
         elipsoidy = {'WGS84':[6378137.000, 0.00669438002290], 'GRS80':[6378137.000, 0.00669438002290], 'Krasowski':[6378245.000, 0.00669342162296]}
         
         # te ify sa po to zeby dzialalo jesli nie odpalasz przez cmd albo nie uzywasz flag
         # jesli nie chcesz co chwila wpisywac danych to to odkomentuj i zmieniaj na co chcesz
-        # args.el = 'GRS80'
-        # args.p = 'plik_dane.txt'
-        # args.t = 'hirvonen'
+        #args.el = 'WGS84'
+        #args.p = 'xyz2neup_dane.txt'
+        #args.t = 'xyz2neup'
         
         if args.el==None:
             args.el = input(str('Podaj nazwe elipsoidy: '))
@@ -167,9 +195,10 @@ if __name__ == '__main__':
         obiekt = Transformation(elipsoidy[args.el])
     except KeyError:
         print('Zle podano nazwe elipsoidy')
+        print('Koniec programu')
     else:
         try:
-            transformacje = {'hirvonen': 'hirvonen','hirvonen_odw': 'hirvonen_odw','PL2000':'PL2000'}
+            transformacje = {'hirvonen': 'hirvonen','hirvonen_odw': 'hirvonen_odw','PL2000':'PL2000', 'xyz2neup':'xyz2neup'}
             if args.p==None:
                 args.p = input(str('Wklej sciezke do pliku txt z danymi: '))
     
@@ -182,6 +211,8 @@ if __name__ == '__main__':
             print('Podany plik nie istnieje')
         except KeyError:
             print('Zle podana transformacja')
+        except IndexError:
+            print('Zly format danych w pliku')
         else:
             print('Plik wynikowy zostal utworzony')
         finally:
