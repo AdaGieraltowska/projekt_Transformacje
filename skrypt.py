@@ -162,41 +162,41 @@ class Transformation:
         dane = np.genfromtxt(plik_wsadowy,delimiter = " ")
         if transformacja == 'XYZ2BLH':
             wyniki = self.hirvonen(dane[:,0], dane[:,1], dane[:,2])
-            plik_wynikowy = np.savetxt(f"plik_wynikowy_{transformacja}.txt", wyniki, delimiter=' ', fmt='%0.10f %0.10f %0.3f')
+            plik_wynikowy = np.savetxt(f"plik_wynikowy_{transformacja}_{args.el}.txt", wyniki, delimiter=' ', fmt='%0.10f %0.10f %0.3f')
         
         elif transformacja == 'BLH2XYZ':
             wyniki = self.hirvonen_odw(np.deg2rad((dane[:,0])), np.deg2rad(dane[:,1]), dane[:,2])
-            plik_wynikowy = np.savetxt(f"plik_wynikowy_{transformacja}.txt", wyniki, delimiter=' ', fmt='%0.3f %0.3f %0.3f')
+            plik_wynikowy = np.savetxt(f"plik_wynikowy_{transformacja}_{args.el}.txt", wyniki, delimiter=' ', fmt='%0.3f %0.3f %0.3f')
 
         elif transformacja == 'PL2000':
             wyniki = self.pl2000(np.deg2rad(dane[:,0]), np.deg2rad(dane[:,1]))
-            plik_wynikowy = np.savetxt(f"plik_wynikowy_{transformacja}.txt", wyniki, delimiter=' ', fmt='%0.3f %0.3f')
+            plik_wynikowy = np.savetxt(f"plik_wynikowy_{transformacja}_{args.el}.txt", wyniki, delimiter=' ', fmt='%0.3f %0.3f')
         
         elif transformacja == 'PL1992':
             wyniki = self.pl1992(np.deg2rad(dane[:,0]), np.deg2rad(dane[:,1]))
-            plik_wynikowy = np.savetxt(f"plik_wynikowy_{transformacja}.txt", wyniki, delimiter=' ', fmt='%0.3f %0.3f')
+            plik_wynikowy = np.savetxt(f"plik_wynikowy_{transformacja}_{args.el}.txt", wyniki, delimiter=' ', fmt='%0.3f %0.3f')
         
         elif transformacja == 'XYZ2NEUP':
             wyniki = self.xyz2neup(dane[1:,0], dane[1:,1], dane[1:,2], dane[0,0], dane[0,1], dane[0,2])
-            plik_wynikowy = np.savetxt(f"plik_wynikowy_{transformacja}.txt", wyniki, delimiter=' ', fmt='%0.3f %0.3f %0.3f')
+            plik_wynikowy = np.savetxt(f"plik_wynikowy_{transformacja}._{args.el}txt", wyniki, delimiter=' ', fmt='%0.3f %0.3f %0.3f')
         return
     
 if __name__ == '__main__':
-    try:
-        parser = ArgumentParser()
-        parser.add_argument('-p', type=str, help='Przyjmuje sciezke do pliku z danymi wejsciowymi, jesli plik jest w tym samym folderze co skrypt to wystarczy nazwa pliku z rozszerzeniem')
-        parser.add_argument('-el', type=str, help='Przyjmuje nazwe elipsoidy. Dostepne: WGS84, GRS80 lub KRASOWSKI')
-        parser.add_argument('-t', type=str, help='Przyjmuje nazwe wybranej transformacji. Dostepne: XYZ2BLH, BLH2XYZ, PL2000, PL1992, XYZ2NEUP')
-        args = parser.parse_args()
+    # try:
+    parser = ArgumentParser()
+    parser.add_argument('-p', type=str, help='Przyjmuje sciezke do pliku z danymi wejsciowymi, jesli plik jest w tym samym folderze co skrypt to wystarczy nazwa pliku z rozszerzeniem')
+    parser.add_argument('-el', type=str, help='Przyjmuje nazwe elipsoidy. Dostepne: WGS84, GRS80 lub KRASOWSKI')
+    parser.add_argument('-t', type=str, help='Przyjmuje nazwe wybranej transformacji. Dostepne: XYZ2BLH, BLH2XYZ, PL2000, PL1992, XYZ2NEUP')
+    args = parser.parse_args()
 
-        elipsoidy = {'WGS84':[6378137.000, 0.00669438002290], 'GRS80':[6378137.000, 0.00669438002290], 'KRASOWSKI':[6378245.000, 0.00669342162296]}
+    elipsoidy = {'WGS84':[6378137.000, 0.00669438002290], 'GRS80':[6378137.000, 0.00669438002290], 'KRASOWSKI':[6378245.000, 0.00669342162296]}
         
         # te ify sa po to zeby dzialalo jesli nie odpalasz przez cmd albo nie uzywasz flag
         # jesli nie chcesz co chwila wpisywac danych to to odkomentuj i zmieniaj na co chcesz
-        args.el = 'wgs84'
-        args.p = 'plik_dane_fi_lam.txt'
-        args.t = 'pl1992'
-        
+        # args.el = 'wgs84'
+        # args.p = 'plik_dane_fi_lam.txt'
+        # args.t = 'pl1992'
+    try:
         if args.el==None:
             args.el = input(str('Podaj nazwe elipsoidy: '))
             
@@ -205,23 +205,37 @@ if __name__ == '__main__':
         print('Zle podano nazwe elipsoidy')
         print('Koniec programu')
     else:
+        wybor = "TAK"
         try:
-            transformacje = {'XYZ2BLH': 'XYZ2BLH','BLH2XYZ': 'BLH2XYZ','PL2000':'PL2000','PL1992':'PL1992', 'XYZ2NEUP':'XYZ2NEUP'}
-            if args.p==None:
-                args.p = input(str('Wklej sciezke do pliku txt z danymi: '))
-    
-            if args.t==None:
-                args.t = input(str('Jaka transformacje wykonac?: '))
+            while wybor =="TAK":
                 
-            dane = obiekt.odczyt(args.p, transformacje[args.t.upper()])
-            
+                transformacje = {'XYZ2BLH': 'XYZ2BLH','BLH2XYZ': 'BLH2XYZ','PL2000':'PL2000','PL1992':'PL1992', 'XYZ2NEUP':'XYZ2NEUP'}
+                if args.el==None:
+                    args.el = input(str('Podaj nazwe elipsoidy: '))
+                if args.p==None:
+                    args.p = input(str('Wklej sciezke do pliku txt z danymi: '))
+        
+                if args.t==None:
+                    args.t = input(str('Jaka transformacje wykonac?: '))
+                obiekt = Transformation(elipsoidy[args.el.upper()])
+
+                dane = obiekt.odczyt(args.p, transformacje[args.t.upper()])
+                wybor = input(str("Jezeli chcesz wykonać kolejną transformację wpisz TAK jesli chcesz zakończyć NIE:")).upper()
+                args.el = None
+                args.p=None
+                args.t=None
+
+
         except FileNotFoundError:
             print('Podany plik nie istnieje.')
         except KeyError:
             print('Zle podana transformacja.')
         except IndexError:
             print('Zly format danych w pliku.')
+       
         else:
             print('Plik wynikowy zostal utworzony.')
         finally:
             print('Koniec programu')
+# if wybor != "TAK":
+    #     z =3
