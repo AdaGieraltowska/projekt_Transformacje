@@ -167,7 +167,7 @@ class Transformation:
         
         elif transformacja == 'XYZ2NEUP':
             wyniki = self.xyz2neup(dane[1:,0], dane[1:,1], dane[1:,2], dane[0,0], dane[0,1], dane[0,2])
-            np.savetxt(f"plik_wynikowy_{transformacja}._{args.el}txt", wyniki, delimiter=' ', fmt='%0.3f %0.3f %0.3f')
+            np.savetxt(f"plik_wynikowy_{transformacja}._{args.el}.txt", wyniki, delimiter=' ', fmt='%0.3f %0.3f %0.3f')
     
 if __name__ == '__main__':
     parser = ArgumentParser()
