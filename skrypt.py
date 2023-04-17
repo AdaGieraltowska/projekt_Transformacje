@@ -171,7 +171,7 @@ class Transformation:
     
 if __name__ == '__main__':
     parser = ArgumentParser()
-    parser.add_argument('-p', type=str, help='Przyjmuje sciezke do pliku z danymi wejsciowymi, jesli plik jest w tym samym folderze co skrypt to wystarczy nazwa pliku z rozszerzeniem')
+    parser.add_argument('-p', type=str, help='Przyjmuje sciezke do pliku z danymi wejsciowymi(bez " "), jesli plik jest w tym samym folderze co skrypt to wystarczy nazwa pliku z rozszerzeniem')
     parser.add_argument('-el', type=str, help='Przyjmuje nazwe elipsoidy. Dostepne: WGS84, GRS80 lub KRASOWSKI')
     parser.add_argument('-t', type=str, help='Przyjmuje nazwe wybranej transformacji. Dostepne: XYZ2BLH, BLH2XYZ, PL2000, PL1992, XYZ2NEUP')
     args = parser.parse_args()
