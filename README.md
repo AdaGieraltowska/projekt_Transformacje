@@ -76,7 +76,7 @@ Wszystkie dane w plikach wejściowych i wyjściowych są oddzielone od siebie sp
 >51.1079 17.0385\
 >51.7592 19.4550
 
-Pierwsza wartość to szerokość geodezyjna, a druga to długość geodezyjna.
+Pierwsza wartość to szerokość geodezyjna[stopnie], a druga to długość geodezyjna[stopnie].
 
 - plik_wynikowy_PL2000_grs80.txt
 
@@ -86,7 +86,7 @@ Pierwsza wartość to szerokość geodezyjna, a druga to długość geodezyjna.
 >5664093.136 6432667.451\
 >5737111.071 6600451.534
 
-Pierwsza wartość to współrzędna X, a druga to współrzędna Y.
+Pierwsza wartość to współrzędna X[m], a druga to współrzędna Y[m].
 
 #### BLH --> XYZ
 - plik_dane_BLH2XYZ.txt
@@ -97,7 +97,7 @@ Pierwsza wartość to współrzędna X, a druga to współrzędna Y.
 >51.1079 17.0385 118.000\
 >51.7592 19.4550 182.000
 
-Pierwsza wartość to szerokość geodezyjna, druga to długość geodezyjna, a trzecia to wysokość punktu.
+Pierwsza wartość to szerokość geodezyjna[stopnie], druga to długość geodezyjna[stopnie], a trzecia to wysokość punktu[m].
 
 - plik_wynikowy_BLH2XYZ_grs80.txt
 
@@ -107,7 +107,7 @@ Pierwsza wartość to szerokość geodezyjna, druga to długość geodezyjna, a 
 >3836640.805 1175798.397 4941181.911\
 >3730268.374 1317661.092 4986406.785
 
-Pierwsza wartość to współrzędna X, druga to współrzędna Y, a trzecia to współrzędna Z.
+Pierwsza wartość to współrzędna X[m], druga to współrzędna Y[m], a trzecia to współrzędna Z[m].
 #### XYZ --> BLH
 - plik_dane_XYZ2BLH.txt
 
@@ -117,7 +117,7 @@ Pierwsza wartość to współrzędna X, druga to współrzędna Y, a trzecia to 
 >3836640.8048792393 1175798.397398429 4941181.911009777\
 >3730268.373914433 1317661.09184508 4986406.785425414
 
-Pierwsza wartość to współrzędna X, druga to współrzędna Y, a trzecia to współrzędna Z.
+Pierwsza wartość to współrzędna X[m], druga to współrzędna Y[m], a trzecia to współrzędna Z[m].
 
 - plik_wynikowy_XYZ2BLH_grs80.txt
 
@@ -127,7 +127,7 @@ Pierwsza wartość to współrzędna X, druga to współrzędna Y, a trzecia to 
 >51.1079000000 17.0385000000 118.000\
 >51.7592000000 19.4550000000 182.000
 
-Pierwsza wartość to szerokość geodezyjna, druga to długość geodezyjna, a trzecia to wysokość punktu.
+Pierwsza wartość to szerokość geodezyjna[stopnie], druga to długość geodezyjna[stopnie], a trzecia to wysokość punktu[m].
 
 #### XYZ --> NEUp
 - plik_dane_XYZ2NEUP.txt
@@ -139,7 +139,7 @@ Pierwsza wartość to szerokość geodezyjna, druga to długość geodezyjna, a 
 >1.982159728800000250e+07 3.882086669999999925e+06 1.731373310199999809e+07\
 >-5.921297010999999940e+06 -2.445428761199999973e+07 -8.484889633000001311e+06\
 
-W pierwszym wierszu znajdują się kolejno współrzędne X, Y, Z odbiornika na Ziemi. Natomiast w pozostałych wierszach pierwsza wartość to współrzędna X satelity, druga to współrzędna Y satelity, a trzecia to współrzędna Z satelity.
+W pierwszym wierszu znajdują się kolejno współrzędne X[m], Y[m], Z[m] odbiornika na Ziemi. Natomiast w pozostałych wierszach pierwsza wartość to współrzędna X satelity[m], druga to współrzędna Y satelity[m], a trzecia to współrzędna Z satelity[m].
 
 - plik_wynikowy_XYz2NEUP_wgs84.txt
 
@@ -149,7 +149,7 @@ W pierwszym wierszu znajdują się kolejno współrzędne X, Y, Z odbiornika na 
 >-4998318.921 -3479185.048 19527908.835\
 >6058904.131 -20708041.190 -21849862.779
 
-W wierszach znajdują się kolejno współrzędne X, Y, Z w układzie topocentrycznym.
+W wierszach znajdują się kolejno współrzędne X[m], Y[m], Z[m] w układzie topocentrycznym.
 
 ## Błędy
 - Program nie wykona transformacji dla plików z danymi z tylko jednym wierszem. Zostanie to uznane jako błąd, nawet jeśli dane wprowadzone są poprawnie.
