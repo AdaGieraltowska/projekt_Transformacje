@@ -154,3 +154,4 @@ W wierszach znajdują się kolejno współrzędne X[m], Y[m], Z[m] w układzie t
 ## Błędy
 - Program nie wykona transformacji dla plików z danymi z tylko jednym wierszem. Zostanie to uznane jako błąd, nawet jeśli dane wprowadzone są poprawnie.
 - W przypadku kiedy użytkownik nie podaje ścieżki do pliku przy użyciu flagi -t i poda ją w formie *"ścieżka_do_pliku.txt"* zamiast *ścieżka_do_pliku.txt* to wyskoczy komunikat o tym, że podany plik nie istnieje.
+- Transformacja współrzędnych geodezyjnych do układu współrzędnych PL2000 i PL1992 w odniesieniu do elipsoidy Krasowskiego, mimo, że jest dostępna zwraca błędne wyniki
